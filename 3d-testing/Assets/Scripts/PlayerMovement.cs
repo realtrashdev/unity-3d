@@ -78,6 +78,7 @@ public class PlayerMovement : MonoBehaviour
 
     void SpeedControl()
     {
+        //prevents player movement speed from going over the maximum
         Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
         if (flatVel.magnitude > moveSpeed)
@@ -93,7 +94,7 @@ public class PlayerMovement : MonoBehaviour
         if (stamina > maxStamina)
         {
             stamina = maxStamina;
-            staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0.2f, 0.28f, 0.18f, 0), Time.deltaTime * 7.5f);
+            staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0f, 0f, 0f, 0), Time.deltaTime * 7.5f);
         }
 
         //stamina goes negative, set it to 0
@@ -108,9 +109,11 @@ public class PlayerMovement : MonoBehaviour
             staminaDelay = 2f;
         }
 
+
+        //if holding shift and moving while not having a stamina delay, ramp up movement speed to running and decrease stamina.
         if (Input.GetKey(KeyCode.LeftShift) && staminaDelay <= 0 && rb.velocity != Vector3.zero)
         {
-            staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0.2f, 0.28f, 0.18f, 1), Time.deltaTime * 15);
+            staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0.8f, 0.8f, 0.8f, 0.5f), Time.deltaTime * 15);
 
             if (moveSpeed != 4)
             {
@@ -147,11 +150,13 @@ public class PlayerMovement : MonoBehaviour
             moveSpeed = 2;
         }
 
+        //if somehow neither of these if statements work, default to walking speed.
         else
         {
             moveSpeed = 2;
         }
 
+        //update stamina bar
         staminaBar.SetStamina(stamina);
     }
 }
