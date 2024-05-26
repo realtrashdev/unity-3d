@@ -6,8 +6,9 @@ using UnityEngine.Experimental.GlobalIllumination;
 public class Flashlight : MonoBehaviour
 {
     bool lightOn = true;
-    GameObject spotLight;
-    public Animator anim;
+    [SerializeField] private GameObject spotLight;
+    [SerializeField] private Animator anim;
+    [SerializeField] private FlashlightSway flashlightSway;
 
     void Start()
     {
@@ -24,7 +25,7 @@ public class Flashlight : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F))
         {
             lightOn = !lightOn;
-            //flashlightHolder.GetComponent<FlashlightSway>().doSway = lightOn;
+            flashlightSway.doSway = lightOn;
             spotLight.SetActive(lightOn);
             anim.SetBool("lightOn", lightOn);
         }
