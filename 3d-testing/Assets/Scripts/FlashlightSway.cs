@@ -10,6 +10,8 @@ public class FlashlightSway : MonoBehaviour
 
     [HideInInspector] public bool doSway = true;
 
+    public Transform playerCam;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,7 +44,8 @@ public class FlashlightSway : MonoBehaviour
 
         Quaternion targetRotation = rotationX * rotationY;
 
-        //rotate
+        //move & rotate
         transform.localRotation = Quaternion.Slerp(transform.localRotation, targetRotation, smooth * Time.deltaTime);
+        transform.localPosition = Vector3.Lerp(transform.localPosition, new Vector3(-0.48f, -0.77f, 0.3f), smooth * Time.deltaTime);
     }
 }
