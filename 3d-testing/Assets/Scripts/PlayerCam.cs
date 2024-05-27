@@ -7,7 +7,10 @@ public class PlayerCam : MonoBehaviour
     public float xSens;
     public float ySens;
 
+    public float fovSmoothing;
+
     public Transform orientation;
+    public PlayerMovement playerMovement;
 
     float xRotation;
     float yRotation;
@@ -31,5 +34,20 @@ public class PlayerCam : MonoBehaviour
         //rotate cam and orientation
         transform.rotation = Quaternion.Euler(xRotation, yRotation, 0);
         orientation.rotation = Quaternion.Euler(0, yRotation, 0);
+
+        FieldOfView();
+    }
+
+    void FieldOfView()
+    {
+        if (playerMovement.moveSpeed > 2)
+        {
+            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, 80, fovSmoothing * Time.deltaTime);
+        }
+
+        else
+        {
+            Camera.main.fieldOfView = Mathf.Lerp(Camera.main.fieldOfView, 70, fovSmoothing * Time.deltaTime);
+        }
     }
 }

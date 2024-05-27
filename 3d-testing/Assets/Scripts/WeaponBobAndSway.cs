@@ -28,9 +28,14 @@ public class WeaponBobAndSway : MonoBehaviour
             multiplier = new Vector3(0.2f, 0.1f, 0);
         }
 
-        else
+        else if (mover.moveSpeed == 2 && rb.velocity != Vector3.zero)
         {
             multiplier = new Vector3(1, 0.5f, 0);
+        }
+
+        else
+        {
+            multiplier = new Vector3(2, 1, 0);
         }
 
         GetInput();

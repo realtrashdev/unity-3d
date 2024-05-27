@@ -8,11 +8,16 @@ public class Flashlight : MonoBehaviour
     bool lightOn = true;
     [SerializeField] private GameObject spotLight;
     [SerializeField] private Animator anim;
+    [SerializeField] private AudioSource audioSource;
+    [SerializeField] private AudioClip flashlightClick1;
     [SerializeField] private FlashlightSway flashlightSway;
+
+    [SerializeField] bool leftHanded;
 
     void Start()
     {
-        spotLight = GameObject.Find("FlashlightLight");
+        anim.SetBool("leftHanded", leftHanded);
+        audioSource.volume *= AudioManagement.gameVolume;
     }
 
     void Update()
@@ -24,10 +29,18 @@ public class Flashlight : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
+            FlashlightSound();
+
             lightOn = !lightOn;
             flashlightSway.doSway = lightOn;
             spotLight.SetActive(lightOn);
             anim.SetBool("lightOn", lightOn);
         }
+    }
+
+    void FlashlightSound()
+    {
+        audioSource.pitch = Random.Range(0.8f, 1.2f);
+        audioSource.PlayOneShot(flashlightClick1);
     }
 }

@@ -28,11 +28,6 @@ public class FlashlightSway : MonoBehaviour
         {
             Sway();
         }
-
-        else
-        {
-            Debug.Log("Sway off.");
-        }
     }
 
     void Sway()

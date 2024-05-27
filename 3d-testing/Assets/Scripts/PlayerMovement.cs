@@ -17,11 +17,17 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask whatIsGround;
     [HideInInspector] public bool isGrounded;
 
-    public Transform orientation;
-
     [Header("Stamina")]
     public StaminaBar staminaBar;
     public GameObject staminaBarUI;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+    public AudioClip[] grassSteps;
+    private AudioClip grassStepClip;
+    private float audioTimer;
+
+    public Transform orientation;
 
     float horizontalInput;
     float verticalInput;
@@ -49,6 +55,7 @@ public class PlayerMovement : MonoBehaviour
         CheckSprint();
         GetInput();
         SpeedControl();
+        MovementAudio();
 
         //apply drag accordingly
         if (isGrounded)
@@ -94,7 +101,7 @@ public class PlayerMovement : MonoBehaviour
         if (stamina > maxStamina)
         {
             stamina = maxStamina;
-            staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0f, 0f, 0f, 0), Time.deltaTime * 7.5f);
+            staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0f, 0f, 0f, 0f), Time.deltaTime * 7.5f);
         }
 
         //stamina goes negative, set it to 0
@@ -150,7 +157,7 @@ public class PlayerMovement : MonoBehaviour
             moveSpeed = 2;
         }
 
-        //if somehow neither of these if statements work, default to walking speed.
+        //if somehow none of these if statements work, default to walking speed.
         else
         {
             moveSpeed = 2;
@@ -158,5 +165,33 @@ public class PlayerMovement : MonoBehaviour
 
         //update stamina bar
         staminaBar.SetStamina(stamina);
+    }
+
+    void MovementAudio()
+    {
+        if (rb.velocity != Vector3.zero)
+        {
+            //grass specific, change later when adding more materials
+            int index = Random.Range(0, grassSteps.Length);
+            grassStepClip = grassSteps[index];
+
+            if (audioTimer <= 0)
+            {
+                audioSource.pitch = Random.Range(1f, 1.2f);
+                audioSource.PlayOneShot(grassStepClip);
+            }
+
+            if (moveSpeed == 2 && audioTimer <= 0)
+            {
+                audioTimer = 0.6f;
+            }
+
+            else if (moveSpeed > 2 && audioTimer <= 0)
+            {
+                audioTimer = 0.3f;
+            }
+
+            audioTimer -= Time.deltaTime;
+        }
     }
 }
