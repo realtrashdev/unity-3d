@@ -5,12 +5,18 @@ using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public Animator camAnim;
+    public Animator playerAnim;
+    public Collider crouchDetection;
+
     [Header("Movement")]
     public float moveSpeed;
     public float groundDrag;
     public float maxStamina;
     public float stamina;
     public float staminaDelay;
+    [HideInInspector] public bool crouched = false;
+    private bool canUncrouch = true;
 
     [Header("Ground Check")]
     public float playerHeight;
@@ -52,7 +58,9 @@ public class PlayerMovement : MonoBehaviour
         //ground check
         isGrounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.2f, whatIsGround);
 
+        CheckCrouch();
         CheckSprint();
+
         GetInput();
         SpeedControl();
         MovementAudio();
@@ -98,14 +106,14 @@ public class PlayerMovement : MonoBehaviour
     void CheckSprint()
     {
         //if stamina exceeds the max, set it to the max & fade out stamina bar
-        if (stamina > maxStamina)
+        if (stamina >= maxStamina)
         {
-            stamina = maxStamina;
+            if (stamina > maxStamina) { stamina = maxStamina; }
             staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0f, 0f, 0f, 0f), Time.deltaTime * 7.5f);
         }
 
         //stamina goes negative, set it to 0
-        if (stamina < 0)
+        else if (stamina < 0)
         {
             stamina = 0;
         }
@@ -117,8 +125,8 @@ public class PlayerMovement : MonoBehaviour
         }
 
 
-        //if holding shift and moving while not having a stamina delay, ramp up movement speed to running and decrease stamina.
-        if (Input.GetKey(KeyCode.LeftShift) && staminaDelay <= 0 && rb.velocity != Vector3.zero)
+        //if: holding shift, moving, while not having a stamina delay, and not crouching, ramp up movement speed to running (4) and decrease stamina.
+        if (Input.GetKey(KeyCode.LeftShift) && staminaDelay <= 0 && rb.velocity != Vector3.zero && !crouched)
         {
             staminaBarUI.GetComponent<Image>().color = Color.Lerp(staminaBarUI.GetComponent<Image>().color, new Color(0.8f, 0.8f, 0.8f, 0.5f), Time.deltaTime * 15);
 
@@ -135,8 +143,8 @@ public class PlayerMovement : MonoBehaviour
             stamina -= Time.deltaTime;
         }
 
-        //if not holding shift or not moving, set speed to walking and check if stamina delay is active. if not, regain stamina.
-        else if (!Input.GetKey(KeyCode.LeftShift) || rb.velocity == Vector3.zero)
+        //if not sprinting or not moving, set speed to walking (2) and check if stamina delay is active. if not, regain stamina.
+        else if (!Input.GetKey(KeyCode.LeftShift) || rb.velocity == Vector3.zero || crouched)
         {
             if (stamina == 0)
             {
@@ -144,8 +152,9 @@ public class PlayerMovement : MonoBehaviour
                 stamina = 0.001f;
             }
 
-            if (staminaDelay <= 0)
+            else if (staminaDelay <= 0 && stamina < maxStamina)
             {
+                Debug.Log("Refilling Stamina...");
                 stamina += Time.deltaTime;
             }
 
@@ -154,11 +163,15 @@ public class PlayerMovement : MonoBehaviour
                 staminaDelay -= Time.deltaTime;
             }
 
-            moveSpeed = 2;
+            //if not crouching, set movement speed to walking (2)
+            if (!crouched)
+            {
+                moveSpeed = 2;
+            }
         }
 
-        //if somehow none of these if statements work, default to walking speed.
-        else
+        //if somehow none of these if statements get called, default to walking speed.
+        else if (!crouched)
         {
             moveSpeed = 2;
         }
@@ -167,9 +180,39 @@ public class PlayerMovement : MonoBehaviour
         staminaBar.SetStamina(stamina);
     }
 
+    void CheckCrouch()
+    {
+        //if holding left control and not already crouching, crouched = true
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            crouched = true;
+            crouchDetection.enabled = true;
+        }
+
+        else if (canUncrouch) 
+        {
+            crouched = false;
+            crouchDetection.enabled = false;
+        }
+
+        camAnim.SetBool("crouching", crouched);
+        playerAnim.SetBool("crouching", crouched);
+
+        //lower movement speed to crouching (1) and set speed to crouching if it gets too low
+        if (crouched && moveSpeed != 1)
+        {
+            moveSpeed -= moveSpeed/10;
+            
+            if (moveSpeed < 1)
+            {
+                moveSpeed = 1;
+            }
+        }
+    }
+
     void MovementAudio()
     {
-        if (rb.velocity != Vector3.zero)
+        if (!crouched && rb.velocity != Vector3.zero)
         {
             //grass specific, change later when adding more materials
             int index = Random.Range(0, grassSteps.Length);
@@ -192,6 +235,26 @@ public class PlayerMovement : MonoBehaviour
             }
 
             audioTimer -= Time.deltaTime;
+        }
+    }
+
+    //while crouching, detect if there is something above the player that would block them from standing
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("canCrouchUnder"))
+        {
+            Debug.Log("Entered Trigger");
+            canUncrouch = false;
+        }
+    }
+
+    //detect when the area above the player is no longer blocked then and allows them to stand
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("canCrouchUnder"))
+        {
+            Debug.Log("Exited Trigger");
+            canUncrouch = true;
         }
     }
 }

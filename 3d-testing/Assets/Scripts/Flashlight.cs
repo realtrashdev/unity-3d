@@ -5,7 +5,7 @@ using UnityEngine.Experimental.GlobalIllumination;
 
 public class Flashlight : MonoBehaviour
 {
-    bool lightOn = true;
+    bool lightOn = false;
     [SerializeField] private GameObject spotLight;
     [SerializeField] private Animator anim;
     [SerializeField] private AudioSource audioSource;
