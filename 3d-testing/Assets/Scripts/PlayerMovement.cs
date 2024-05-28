@@ -224,7 +224,7 @@ public class PlayerMovement : MonoBehaviour
                 audioSource.PlayOneShot(grassStepClip);
             }
 
-            if (moveSpeed == 2 && audioTimer <= 0)
+            if (moveSpeed <= 2 && audioTimer <= 0)
             {
                 audioTimer = 0.6f;
             }
