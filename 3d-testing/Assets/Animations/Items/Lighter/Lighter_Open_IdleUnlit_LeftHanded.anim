@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Flashlight_Idle_RightHanded
+  m_Name: Lighter_Open_IdleUnlit_LeftHanded
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
