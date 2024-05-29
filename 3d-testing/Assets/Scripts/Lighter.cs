@@ -57,7 +57,7 @@ public class Lighter : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.J))
         {
-            fuel = 1;
+            fuel = 5;
         }
 
         if (fuel > 0)
@@ -73,6 +73,7 @@ public class Lighter : MonoBehaviour
             if (!turningOff)
             {
                 tooltip.Tooltip("Your lighter ran out of fuel.", Color.white, 5);
+                audioSource.clip = lighterClose;
                 anim.Play("Lighter_Close_" + handed);
                 timer = 1;
                 turningOff = true;
