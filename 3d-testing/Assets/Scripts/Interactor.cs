@@ -39,6 +39,11 @@ public class Interactor : MonoBehaviour
                 Debug.Log("Interactible Found");
                 interactObj.SetInteractPrompt();
             }
+
+            else
+            {
+                interactPrompt.text = "";
+            }
         }
 
         else
