@@ -65,6 +65,11 @@ public class PlayerMovement : MonoBehaviour
         SpeedControl();
         MovementAudio();
 
+        if (rb.velocity == Vector3.zero)
+        {
+            camAnim.SetFloat("speed", 0);
+        }
+
         //apply drag accordingly
         if (isGrounded)
             rb.drag = groundDrag;
@@ -140,6 +145,7 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
 
+            camAnim.SetFloat("speed", 4);
             stamina -= Time.deltaTime;
         }
 
@@ -166,6 +172,7 @@ public class PlayerMovement : MonoBehaviour
             //if not crouching, set movement speed to walking (2)
             if (!crouched)
             {
+                camAnim.SetFloat("speed", 2);
                 moveSpeed = 2;
             }
         }
@@ -173,6 +180,7 @@ public class PlayerMovement : MonoBehaviour
         //if somehow none of these if statements get called, default to walking speed.
         else if (!crouched)
         {
+            camAnim.SetFloat("speed", 2);
             moveSpeed = 2;
         }
 
